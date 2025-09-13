@@ -1,16 +1,16 @@
 {
     "manifestVersion": 1,
-    "id": "oaicr",
-    "version": "1.0.0",
-    "name": "Open AI Code Review",
-    "publisher": "AidanCole",
-    "public": true,
+    "id": "aoaicr",
+    "version": "1.0.14",
+    "name": "Azure Open AI Code Review",
+    "publisher": "Firedew",
+    "public": false,
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
         }
     ],
-    "description": "Integrate Open AI for automated code reviews in Azure DevOps Pull Requests. Enhance code quality and improve review efficiency.",
+    "description": "Integrate Azure Open AI for automated code reviews in Azure DevOps Pull Requests. Enhance code quality and improve review efficiency.",
     "categories": [
         "Azure Pipelines"
     ],
@@ -36,13 +36,13 @@
     },
     "links": {
         "support": {
-            "uri": "https://github.com/a1dancole/openai-code-review/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
+            "uri": "https://github.com/swaana/azure-openai-code-review/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
             "version": "1.0.0"
         }
     },
     "repository": {
         "type": "git",
-        "uri": "https://github.com/a1dancole/OpenAI-Code-Review"
+        "uri": "https://github.com/swaana/Azure-OpenAI-Code-Review"
     },
     "screenshots": [
         {
@@ -69,7 +69,7 @@
     },
     "files": [
         {
-            "path": "src"
+            "path": "dist"
         },
         {
             "path": "assets/overview.md",
@@ -96,7 +96,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "src"
+                "name": "dist"
             }
         }
     ]

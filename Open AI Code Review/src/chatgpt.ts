@@ -1,4 +1,4 @@
-import tl = require('azure-pipelines-task-lib/task');
+import tl from 'azure-pipelines-task-lib/task';
 import { encode } from 'gpt-tokenizer';
 import OpenAI from "openai";
 
@@ -24,6 +24,7 @@ export class ChatGPT {
     public async PerformCodeReview(diff: string, fileName: string): Promise<string> {
 
         let model = tl.getInput('ai_model', true) as | (string & {})
+            | 'gpt-4o-mini'
             | 'gpt-4-1106-preview'
             | 'gpt-4-vision-preview'
             | 'gpt-4'

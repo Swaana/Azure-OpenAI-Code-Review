@@ -23,7 +23,7 @@ export class PullRequest {
         if (!fileName.startsWith('/')) {
             fileName = `/${fileName}`;
         }
-        
+
         let body = {
             comments: [
                 {
@@ -44,15 +44,18 @@ export class PullRequest {
             }
         }
 
+        console.log('Creating comment with body: ' + JSON.stringify(body));
         let endpoint = `${this._collectionUri}${this._teamProjectId}/_apis/git/repositories/${this._repositoryName}/pullRequests/${this._pullRequestId}/threads?api-version=7.0`
+        console.log('Using endpoint: ' + endpoint);
 
         var response = await fetch(endpoint, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${tl.getVariable('SYSTEM.ACCESSTOKEN')}`, 'Content-Type': 'application/json' },
+            headers: { 'Authorization': `Bearer ${tl.getVariable('System.AccessToken')}`, 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
             agent: this._httpsAgent
         });
 
+        console.log(`Response from creating comment: ${response.status} - ${response.statusText}`, await response.text());
         if (response.ok == false) {
             if(response.status == 401) {
                 tl.setResult(tl.TaskResult.Failed, "The Build Service must have 'Contribute to pull requests' access to the repository. See https://stackoverflow.com/a/57985733 for more information");
@@ -107,7 +110,7 @@ export class PullRequest {
         }
 
         let threads = await threadsResponse.json();
-        return threads.value.filter((thread: any) => thread.threadContext !== null);
+        return (threads as any).value.filter((thread: any) => thread.threadContext !== null);
     }
 
     public async GetComments(thread: any): Promise<any> {

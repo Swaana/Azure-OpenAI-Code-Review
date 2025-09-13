@@ -1,8 +1,15 @@
-import tl = require('azure-pipelines-task-lib/task');
-import { OpenAI } from 'openai';
+import tl from 'azure-pipelines-task-lib/task';
+import { AzureOpenAI } from 'openai';
 import { ChatGPT } from './chatgpt';
 import { Repository } from './repository';
 import { PullRequest } from './pullrequest';
+
+// Shim dirname
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+global.__filename = fileURLToPath(import.meta.url);
+global.__dirname = dirname(global.__filename);
 
 export class Main {
     private static _chatGpt: ChatGPT;
@@ -10,6 +17,7 @@ export class Main {
     private static _pullRequest: PullRequest;
 
     public static async Main(): Promise<void> {
+      console.log('Beginning AI code review')
         if (tl.getVariable('Build.Reason') !== 'PullRequest') {
             tl.setResult(tl.TaskResult.Skipped, "This task must only be used when triggered by a Pull Request.");
             return;
@@ -20,18 +28,29 @@ export class Main {
             return;
         }
 
+        console.log('Access Token', tl.getVariable('System.AccessToken')?.substring(0, 4) + '***');
+
         const apiKey = tl.getInput('api_key', true)!;
+        const deployment = tl.getInput('deployment', true)!;
+        const endpoint = tl.getInput('endpoint', true)!;
+        const apiVersion = tl.getInput('api_version', true)!;
         const fileExtensions = tl.getInput('file_extensions', false);
         const filesToExclude = tl.getInput('file_excludes', false);
         const additionalPrompts = tl.getInput('additional_prompts', false)?.split(',')
-        
-        this._chatGpt = new ChatGPT(new OpenAI({ apiKey: apiKey }), tl.getBoolInput('bugs', true), tl.getBoolInput('performance', true), tl.getBoolInput('best_practices', true), additionalPrompts);
+
+        console.log('file_extensions', fileExtensions)
+
+        const client = new AzureOpenAI({ endpoint, apiKey, deployment, apiVersion });
+
+        this._chatGpt = new ChatGPT(client, tl.getBoolInput('bugs', true), tl.getBoolInput('performance', true), tl.getBoolInput('best_practices', true), additionalPrompts);
         this._repository = new Repository();
         this._pullRequest = new PullRequest();
 
         await this._pullRequest.DeleteComments();
 
         let filesToReview = await this._repository.GetChangedFiles(fileExtensions, filesToExclude);
+
+        console.log('filesToReview', filesToReview)
 
         tl.setProgress(0, 'Performing Code Review');
 
@@ -41,6 +60,7 @@ export class Main {
             let review = await this._chatGpt.PerformCodeReview(diff, fileToReview);
 
             if(review.indexOf('NO_COMMENT') < 0) {
+              console.log('Review comment', fileToReview, review)
                 await this._pullRequest.AddComment(fileToReview, review);
             }
 

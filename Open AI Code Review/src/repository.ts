@@ -20,28 +20,37 @@ export class Repository {
     public async GetChangedFiles(fileExtensions: string | undefined, filesToExclude: string | undefined): Promise<string[]> {
         await this._repository.fetch();
 
+        console.log('getting changed files')
+
         let targetBranch = this.GetTargetBranch();
+
+        console.log('target branch: ' + targetBranch)
 
         let diffs = await this._repository.diff([targetBranch, '--name-only', '--diff-filter=AM']);
         let files = diffs.split('\n').filter(line => line.trim().length > 0);
         let filesToReview = files.filter(file => !binaryExtensions.includes(file.slice((file.lastIndexOf(".") - 1 >>> 0) + 2)));
 
+        console.log('files to review (all): ' + filesToReview.join(', '))
         if(fileExtensions) {
             let fileExtensionsToInclude = fileExtensions.trim().split(',');
             filesToReview = filesToReview.filter(file => fileExtensionsToInclude.includes(file.substring(file.lastIndexOf('.'))));
         }
+
+        console.log('files to review (after extensions filter): ' + filesToReview.join(', '))
 
         if(filesToExclude) {
             let fileNamesToExclude = filesToExclude.trim().split(',')
             filesToReview = filesToReview.filter(file => !fileNamesToExclude.includes(file.split('/').pop()!.trim()))
         }
 
+        console.log('files to review (after exclude filter): ' + filesToReview.join(', '))
+
         return filesToReview;
     }
 
     public async GetDiff(fileName: string): Promise<string> {
         let targetBranch = this.GetTargetBranch();
-        
+
         let diff = await this._repository.diff([targetBranch, '--', fileName]);
 
         return diff;

@@ -1,0 +1,42 @@
+{
+  "name": "pr-gpt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf dist distJs",
+    "prebuild": "npm run clean",
+    "buildJs": "tsc -p tsconfig.json --outDir distJs && cp src/binaryExtensions.json distJs/binaryExtensions.json",
+    "build": "rollup -c && cp src/task.json dist/task.json",
+    "release": "tfx extension create --manifest-globs vss-extension.json"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/identity": "^4.11.1",
+    "@dqbd/tiktoken": "^1.0.22",
+    "azure-devops-extension-sdk": "^4.1.0",
+    "azure-pipelines-task-lib": "^5.2.1",
+    "gpt-tokenizer": "^3.0.1",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.19.1",
+    "simple-git": "^3.28.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.3",
+    "@types/q": "^1.5.8",
+    "rollup": "^4.50.1",
+    "rollup-plugin-copy": "^3.5.0",
+    "sync-request": "^6.1.0",
+    "typescript": "^5.9.2"
+  }
+}
